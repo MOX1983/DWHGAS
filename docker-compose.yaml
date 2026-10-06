@@ -92,7 +92,7 @@ x-airflow-common:
     postgres:
       condition: service_healthy
     minio:
-      condition: service_healthy
+      condition: service_healthy   
 
 services:
   postgres:
@@ -145,18 +145,12 @@ services:
 
   greenplum:
     image: andruche/greenplum:6
-    container_name: greenplum_dwh
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gpadmin"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     volumes:
       - gpdata:/web/gpdata
     
