@@ -8,6 +8,5 @@ with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as d
     orders_dataset = SparkSubmitOperator(
         task_id="orders_dataset",
         application="/opt/airflow/dags/scripts/etl.py",
-        conn_id="spark_default",
-        packages="org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262",
+        conn_id="spark_default"
     )
