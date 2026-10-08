@@ -1,0 +1,25 @@
+schemas:
+  - stg
+  - cdm
+
+table:
+  - orders_dataset
+  - customers_dataset
+  - order_items_dataset
+  - products_dataset
+  - sellers_dataset
+  - geolocation_dataset
+  - order_payments_dataset
+  - order_reviews_dataset
+  - product_category_name_translation
+
+file:
+  - olist_orders_dataset
+  - olist_customers_dataset
+  - olist_order_items_dataset
+  - olist_products_dataset
+  - olist_sellers_dataset
+  - olist_geolocation_dataset
+  - olist_order_payments_dataset
+  - olist_order_reviews_dataset
+  - product_category_name_translation
