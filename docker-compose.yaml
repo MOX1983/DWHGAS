@@ -152,7 +152,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - gpdata:/web/gpdata
+      - ./gpdata:/web/gpdata
     
   airflow-apiserver:
     <<: *airflow-common

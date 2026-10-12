@@ -11,6 +11,7 @@ SCHEMAS = {
         StructField("order_delivered_carrier_date", TimestampType(), True),
         StructField("order_delivered_customer_date", TimestampType(), True),
         StructField("order_estimated_delivery_date", DateType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.customers_dataset": StructType([
@@ -19,6 +20,7 @@ SCHEMAS = {
         StructField("customer_zip_code_prefix", IntegerType(), True),
         StructField("customer_city", StringType(), True),
         StructField("customer_state", StringType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.order_items_dataset": StructType([
@@ -29,6 +31,7 @@ SCHEMAS = {
         StructField("shipping_limit_date", TimestampType(), True),
         StructField("price", DecimalType(10, 2), True),
         StructField("freight_value", DecimalType(10, 2), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.products_dataset": StructType([
@@ -41,6 +44,7 @@ SCHEMAS = {
         StructField("product_length_cm", IntegerType(), True),
         StructField("product_height_cm", IntegerType(), True),
         StructField("product_width_cm", IntegerType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.sellers_dataset": StructType([
@@ -48,6 +52,7 @@ SCHEMAS = {
         StructField("seller_zip_code_prefix", IntegerType(), True),
         StructField("seller_city", StringType(), True),
         StructField("seller_state", StringType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.geolocation_dataset": StructType([
@@ -56,6 +61,7 @@ SCHEMAS = {
         StructField("geolocation_lng", DoubleType(), True),
         StructField("geolocation_city", StringType(), True),
         StructField("geolocation_state", StringType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.order_payments_dataset": StructType([
@@ -64,6 +70,7 @@ SCHEMAS = {
         StructField("payment_type", StringType(), True),
         StructField("payment_installments", IntegerType(), True),
         StructField("payment_value", DecimalType(10, 2), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.order_reviews_dataset": StructType([
@@ -74,10 +81,12 @@ SCHEMAS = {
         StructField("review_comment_message", StringType(), True),
         StructField("review_creation_date", TimestampType(), True),
         StructField("review_answer_timestamp", TimestampType(), True),
+        StructField("run_id", StringType())
     ]),
 
     "stg.product_category_name_translation": StructType([
         StructField("product_category_name", StringType(), True),
         StructField("product_category_name_english", StringType(), True),
+        StructField("run_id", StringType())
     ]),
 }

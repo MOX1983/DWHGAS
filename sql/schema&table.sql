@@ -1,5 +1,4 @@
 create schema stg;
-create schema cdm;
 
 
 create table stg.orders_dataset(
@@ -10,7 +9,8 @@ create table stg.orders_dataset(
 	order_approved_at timestamp,
 	order_delivered_carrier_date timestamp,
 	order_delivered_customer_date timestamp,
-	order_estimated_delivery_date date
+	order_estimated_delivery_date date,
+	run_id text
 )
 distributed randomly;
 
@@ -19,7 +19,8 @@ create table stg.customers_dataset(
 	customer_unique_id text,
 	customer_zip_code_prefix int,
 	customer_city text,
-	customer_state text
+	customer_state text,
+	run_id text
 )
 distributed randomly;
 
@@ -30,7 +31,8 @@ create table stg.order_items_dataset(
 	seller_id text,
 	shipping_limit_date timestamp,
 	price decimal(10, 2),
-	freight_value decimal(10, 2)
+	freight_value decimal(10, 2),
+	run_id text
 )
 distributed randomly;
 
@@ -43,7 +45,8 @@ create table stg.products_dataset(
 	product_weight_g int, 
 	product_length_cm int, 
 	product_height_cm int, 
-	product_width_cm int
+	product_width_cm int,
+	run_id text
 )
 distributed randomly;
 
@@ -51,7 +54,8 @@ create table stg.sellers_dataset(
 	seller_id text,
 	seller_zip_code_prefix int,
 	seller_city text,
-	seller_state text
+	seller_state text,
+	run_id text
 )
 distributed randomly;
 
@@ -60,7 +64,8 @@ create table stg.geolocation_dataset(
 	geolocation_lat double precision,
 	geolocation_lng double precision,
 	geolocation_city text,
-	geolocation_state text
+	geolocation_state text,
+	run_id text
 )
 distributed randomly;
 
@@ -69,7 +74,8 @@ create table stg.order_payments_dataset(
 	payment_sequential int,
 	payment_type text,
 	payment_installments int,
-	payment_value decimal(10, 2)
+	payment_value decimal(10, 2),
+	run_id text
 )
 distributed randomly;
 
@@ -80,13 +86,15 @@ create table stg.order_reviews_dataset(
 	review_comment_title text,
 	review_comment_message text,
 	review_creation_date timestamp,
-	review_answer_timestamp timestamp
+	review_answer_timestamp timestamp,
+	run_id text
 )
 distributed randomly;
 
 create table stg.product_category_name_translation(
 	product_category_name text,
-	product_category_name_english text
+	product_category_name_english text,
+	run_id text
 )
 distributed randomly;
 
@@ -99,3 +107,44 @@ select * from stg.products_dataset;
 select count(*) from stg.orders_dataset;
 
 delete from stg.orders_dataset;
+
+
+insert into dds.dim_customers (customer_id, customer_unique_id, customer_zip_code_prefix, 
+	customer_city, customer_state)
+select cd.customer_id, cd.customer_unique_id, cd.customer_zip_code_prefix,
+	cd.customer_city, cd.customer_state 
+from stg.customers_dataset cd;
+
+analyze stg.orders_dataset;
+--проыерить код !!!
+insert into dds.fact_orders (order_id, order_item_id, product_id, price,
+	freight_value, customer_id, seller_id)
+select od.order_id, t.order_item_id, t.product_id, t.price,
+	t.freight_value, od.customer_id, t.seller_id 
+from stg.orders_dataset od 
+join stg.order_items_dataset t 
+on od.order_id = t.order_id and od.run_id == t.run_id ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

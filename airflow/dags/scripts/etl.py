@@ -8,7 +8,7 @@ import sys
 from schemas import SCHEMAS
 
 load_dotenv(Path(__file__).parent / ".env")
-def connect_to_s3(schema_table_name: str, minio_csv_name: str):
+def connect_to_s3(run_id: str, schema_table_name: str, minio_csv_name: str):
     ENDPOINT_URL = os.getenv("ENDPOINT_URL")
     ACCESS_KEY = os.getenv("ACCESS_KEY")
     SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY")
@@ -41,4 +41,4 @@ def connect_to_s3(schema_table_name: str, minio_csv_name: str):
     
     spark.stop()
 
-connect_to_s3(sys.argv[1], sys.argv[2])
+connect_to_s3(sys.argv[1], sys.argv[2], sys.argv[3])

@@ -1,0 +1,96 @@
+create schema dds;
+
+create table dds.fact_orders(
+	order_id text,
+	order_item_id int,
+	product_id text,
+	price decimal(10, 2),
+	freight_value decimal(10, 2),
+	customer_id text,
+	seller_id text
+)
+distributed by (order_id);
+
+
+create table dds.fact_payments(
+	order_id text,
+	payment_sequential int,
+	payment_type text,
+	payment_installments int,
+	payment_value decimal(10, 2)
+)
+distributed by (order_id);
+
+
+create table dds.fact_reviews(
+	review_id text,
+	order_id text,
+	review_score int,
+	review_comment_title text,
+	review_comment_message text,
+	review_creation_date timestamp,
+	review_answer_timestamp timestamp
+)
+distributed by (order_id);
+
+create table dds.dim_orders(
+	order_id text,
+	order_status text,
+	order_approved_at timestamp,
+	order_delivered_carrier_date timestamp,
+	order_delivered_customer_date timestamp,
+	order_estimated_delivery_date date, 
+	order_purchase_timestamp timestamp,
+	shipping_limit_date timestamp	
+)
+distributed by (order_id);
+
+create table dds.dim_products(
+	product_id text,
+	product_category_name text,
+	product_name_lenght int,
+	product_description_lenght int,
+	product_photos_qty int,
+	product_weight_g int, 
+	product_length_cm int, 
+	product_height_cm int, 
+	product_width_cm int
+)
+distributed by (product_id);
+
+create table dds.dim_customers(
+	customer_id text,
+	customer_unique_id text,
+	customer_zip_code_prefix int,
+	customer_city text,
+	customer_state text
+)
+distributed by (customer_id);
+
+create table dds.dim_sellers(
+	seller_id text,
+	seller_zip_code_prefix int,
+	seller_city text,
+	seller_state text
+)
+distributed by (seller_id);
+
+
+create table dds.dim_geolocation(
+	geolocation_zip_code_prefix int,
+	geolocation_lat double precision,
+	geolocation_lng double precision,
+	geolocation_city text,
+	geolocation_state text
+)
+distributed by (geolocation_city);
+
+
+select *
+from dds.dim_customers dc ;
+
+select *
+from dds.fact_orders fo ;
+
+
+

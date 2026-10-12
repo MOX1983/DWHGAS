@@ -1,6 +1,6 @@
 schemas:
   - stg
-  - cdm
+  - ddl
 
 table:
   - orders_dataset
@@ -23,3 +23,20 @@ file:
   - olist_order_payments_dataset
   - olist_order_reviews_dataset
   - product_category_name_translation
+
+table_ddl:
+  - fact_orders
+  - fact_payments
+  - fact_reviews
+  - dim_orders
+  - dim_products
+  - dim_customers
+  - dim_sellers
+  - dim_geolocation
+
+dag_task:
+  - /opt/airflow/dags/scripts/etl.py
+  - /opt/airflow/dags/scripts/transform.py
+
+jars:
+  /home/airflow/.local/lib/python3.10/site-packages/pyspark/jars/postgresql-42.6.0.jar
