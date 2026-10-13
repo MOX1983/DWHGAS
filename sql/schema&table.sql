@@ -1,6 +1,7 @@
 create schema stg;
 
 
+
 create table stg.orders_dataset(
 	order_id text,
 	customer_id text,
@@ -10,7 +11,7 @@ create table stg.orders_dataset(
 	order_delivered_carrier_date timestamp,
 	order_delivered_customer_date timestamp,
 	order_estimated_delivery_date date,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -20,7 +21,7 @@ create table stg.customers_dataset(
 	customer_zip_code_prefix int,
 	customer_city text,
 	customer_state text,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -32,7 +33,7 @@ create table stg.order_items_dataset(
 	shipping_limit_date timestamp,
 	price decimal(10, 2),
 	freight_value decimal(10, 2),
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -46,7 +47,7 @@ create table stg.products_dataset(
 	product_length_cm int, 
 	product_height_cm int, 
 	product_width_cm int,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -55,7 +56,7 @@ create table stg.sellers_dataset(
 	seller_zip_code_prefix int,
 	seller_city text,
 	seller_state text,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -65,7 +66,7 @@ create table stg.geolocation_dataset(
 	geolocation_lng double precision,
 	geolocation_city text,
 	geolocation_state text,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -75,7 +76,7 @@ create table stg.order_payments_dataset(
 	payment_type text,
 	payment_installments int,
 	payment_value decimal(10, 2),
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -87,14 +88,14 @@ create table stg.order_reviews_dataset(
 	review_comment_message text,
 	review_creation_date timestamp,
 	review_answer_timestamp timestamp,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
 create table stg.product_category_name_translation(
 	product_category_name text,
 	product_category_name_english text,
-	run_id text
+	logical_date timestamp
 )
 distributed randomly;
 
@@ -104,6 +105,7 @@ select * from stg.orders_dataset;
 select * from stg.customers_dataset;
 select * from stg.products_dataset;
 
+select max(logical_date) from stg.orders_dataset;
 select count(*) from stg.orders_dataset;
 
 delete from stg.orders_dataset;
@@ -123,8 +125,14 @@ select od.order_id, t.order_item_id, t.product_id, t.price,
 	t.freight_value, od.customer_id, t.seller_id 
 from stg.orders_dataset od 
 join stg.order_items_dataset t 
-on od.order_id = t.order_id and od.run_id == t.run_id ;
+on od.order_id = t.order_id and od.logical_date == t.logical_date ;
 
+
+select count(*)
+from stg.orders_dataset od 
+join stg.order_items_dataset t 
+on od.order_id = t.order_id and od.logical_date = t.logical_date
+where od.logical_date = '2026-10-13 14:17:57.000';
 
 
 

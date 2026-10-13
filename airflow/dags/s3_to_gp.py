@@ -16,28 +16,53 @@ with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as d
     data = load_yaml()
     task = []
 
-    # for i in range(9):
-    #     orders_dataset = SparkSubmitOperator(
-    #         task_id=f"orders_dataset_{i}",
-    #         application=data["dag_task"][0],
-    #         conn_id="spark_default",
-    #         application_args=["{{ run_id }}",
-    #             data["schemas"][0] + "." + data["table"][i],
-    #             data["file"][i]],
-    #         pool="two_pool"
-    #     )
-    #     task.append(orders_dataset)
+#ну что мне делать.... как мне в future сделать неприрывную обработу ?????
+# если бы это была не учебная работа, как я гарантирую, что у меня будет появляться файл с новыми клиентами ???(города....)
+# для каждой таблицы отдельный даг? или распилить их на entity (мб, надо подумать )
+# или сделать mvp ? потом переделывать много
 
-    kimball_task = SparkSubmitOperator(
-        task_id=f"kimball_task",
+    for i in range(9):
+        orders_dataset = SparkSubmitOperator(
+            task_id=f"orders_dataset_{i}",
+            application=data["dag_task"][0],
+            conn_id="spark_default",
+            application_args=["{{ ts }}",
+                data["schemas"][0] + "." + data["table"][i],
+                data["file"][i]],
+            pool="two_pool"
+        )
+        task.append(orders_dataset)
+
+    dds_t_fact_orders = SparkSubmitOperator(
+        task_id=f"dds_t_fact_orders",
         application=data["dag_task"][1],
         conn_id="spark_default",
         pool="two_pool",
         jars=data['jars'],
-        application_args=["{{ run_id }}"]
+        application_args=["{{ ts }}"]
     )
 
-    # task >> kimball_task
+    dds_t_fact_payments = SparkSubmitOperator(
+        task_id=f"dds_t_fact_payments",
+        application=data["dag_task"][2],
+        conn_id="spark_default",
+        pool="two_pool",
+        jars=data['jars'],
+        application_args=["{{ ts }}"]
+    )
+
+    dds_t_dim_orders = SparkSubmitOperator(
+        task_id=f"dds_t_dim_orders",
+        application=data["dag_task"][3],
+        conn_id="spark_default",
+        pool="two_pool",
+        jars=data['jars'],
+        application_args=["{{ ts }}"]
+    )
+
+
+
+    task >> dds_t_fact_orders >> dds_t_fact_payments >> dds_t_dim_orders
 
 
 

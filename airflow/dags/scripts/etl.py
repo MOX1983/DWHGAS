@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+import pyspark.sql.functions as F
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -8,7 +9,7 @@ import sys
 from schemas import SCHEMAS
 
 load_dotenv(Path(__file__).parent / ".env")
-def connect_to_s3(run_id: str, schema_table_name: str, minio_csv_name: str):
+def connect_to_s3(logical_date: str, schema_table_name: str, minio_csv_name: str):
     ENDPOINT_URL = os.getenv("ENDPOINT_URL")
     ACCESS_KEY = os.getenv("ACCESS_KEY")
     SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY")
@@ -27,7 +28,9 @@ def connect_to_s3(run_id: str, schema_table_name: str, minio_csv_name: str):
         .config("spark.hadoop.fs.s3a.path.style.access", "true").getOrCreate()
 
     schema = SCHEMAS[schema_table_name]
-    df = spark.read.option("header", "true").schema(schema).csv(f"s3a://raw/{minio_csv_name}.csv").coalesce(1)
+    df = spark.read.option("header", "true").schema(schema).csv(f"s3a://raw/{minio_csv_name}.csv")\
+        .withColumn("logical_date", F.to_timestamp(F.lit(logical_date)))\
+        .coalesce(1)
 
     df.write.format("jdbc")\
         .option("url", GP_URL)\
