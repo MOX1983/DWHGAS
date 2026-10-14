@@ -41,8 +41,9 @@ dag_task:
   - /opt/airflow/dags/scripts/dds__transform__fact_reviews.py
   - /opt/airflow/dags/scripts/dds__transform__dim_orders.py
   - /opt/airflow/dags/scripts/dds__transform__dim_products.py
-  - /opt/airflow/dags/scripts/
-  - /opt/airflow/dags/scripts/
+  - /opt/airflow/dags/scripts/dds__transform__dim_customers.py
+  - /opt/airflow/dags/scripts/dds__transform__dim_sellers.py
+  - /opt/airflow/dags/scripts/dds__transform__dim_geolocation.py
 
 jars:
   /home/airflow/.local/lib/python3.10/site-packages/pyspark/jars/postgresql-42.6.0.jar
