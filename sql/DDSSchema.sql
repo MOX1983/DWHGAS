@@ -94,14 +94,28 @@ create table dds.dim_geolocation(
 distributed by (geolocation_city);
 
 
-select *
-from dds.dim_customers dc ;
-
-select 
+select count(*)
 from dds.fact_orders fo ;
 
-select sum(fp.payment_value )
-from dds.fact_payments fp;
+select count(*)
+from dds.dim_orders dio ;
+
+select sum(fo.price + fo.freight_value )
+from dds.fact_orders fo 
+where fo.logical_date = '2026-10-16 13:59:07.000';
+
+
+select order_id, count(*) as cnt
+from dds.dim_orders
+where logical_date = '2026-10-16 13:59:07.000'
+group by order_id
+having count(*) > 1
+order by cnt desc
+limit 20;
+
+
+select max(fo.logical_date  )
+from dds.fact_orders fo ;
 
 delete from dds.dim_customers;
 delete from dds.dim_geolocation;

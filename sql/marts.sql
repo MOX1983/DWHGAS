@@ -1,6 +1,6 @@
 create schema marts;
 
---вывести id лиентов и покупателей 
+--плохие витрины исправить 
 drop view if exists marts.orders_items_payments;
 create or replace view marts.orders_items_payments as 
 select  fo.order_id,
@@ -26,3 +26,10 @@ join dds.dim_customers dic
 on fo.customer_id = dic.customer_id
 join dds.dim_sellers dis
 on fo.seller_id = dis.seller_id;
+
+
+select sum(fo.price + fo.freight_value )
+from dds.fact_orders fo
+join dds.dim_orders dio
+on fo.order_id = dio.order_id
+where fo.logical_date = '2026-10-16 13:59:07.000';

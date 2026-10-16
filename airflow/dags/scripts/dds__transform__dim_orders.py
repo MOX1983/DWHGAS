@@ -16,6 +16,9 @@ def dds_t_dim_orders(logical_date: str):
 
     df_order_items = spark.read.format('jdbc') \
         .options(**OPTIONS).options(dbtable=f"{data['schemas'][0]}.{data['table'][2]}").load()
+    df_order_items = df_order_items.filter(df_order_items["logical_date"] == F.lit(logical_date))\
+        .groupBy("order_id")\
+        .agg(F.min("shipping_limit_date").alias("shipping_limit_date"))
 
     df_dim_orders = df_order_items.join(
         F.broadcast(df_orders),
