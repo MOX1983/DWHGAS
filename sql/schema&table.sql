@@ -103,12 +103,22 @@ distributed randomly;
 
 select * from stg.orders_dataset;
 select * from stg.customers_dataset;
-select * from stg.products_dataset;
+select * from stg.products_dataset ;
 
-select max(logical_date) from stg.orders_dataset;
-select count(*) from stg.orders_dataset;
+select max(logical_date) from stg.products_dataset;
+select count(*) from stg.products_dataset where logical_date = '2026-10-15 14:43:12.000';
+
+vacuum;
 
 delete from stg.orders_dataset;
+delete from stg.customers_dataset;
+delete from stg.geolocation_dataset ;
+delete from stg.order_items_dataset ;
+delete from stg.order_payments_dataset ;
+delete from stg.order_reviews_dataset;
+delete from stg.product_category_name_translation;
+delete from stg.products_dataset ;
+delete from stg.sellers_dataset ;
 
 
 insert into dds.dim_customers (customer_id, customer_unique_id, customer_zip_code_prefix, 
@@ -118,7 +128,7 @@ select cd.customer_id, cd.customer_unique_id, cd.customer_zip_code_prefix,
 from stg.customers_dataset cd;
 
 analyze stg.orders_dataset;
---проыерить код !!!
+
 insert into dds.fact_orders (order_id, order_item_id, product_id, price,
 	freight_value, customer_id, seller_id)
 select od.order_id, t.order_item_id, t.product_id, t.price,
@@ -132,7 +142,7 @@ select count(*)
 from stg.orders_dataset od 
 join stg.order_items_dataset t 
 on od.order_id = t.order_id and od.logical_date = t.logical_date
-where od.logical_date = '2026-10-13 14:17:57.000';
+where od.logical_date = '2026-10-15 14:43:12.000';
 
 
 

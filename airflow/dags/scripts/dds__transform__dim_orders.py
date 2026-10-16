@@ -3,10 +3,12 @@ import pyspark.sql.functions as F
 
 import sys
 
-from config import DATA as data, OPTIONS
+from config import DATA as data, OPTIONS, OPTIONS_WRITE
+from connect_db import delete_by_logical_date
 
 
 def dds_t_dim_orders(logical_date: str):
+    DIM_TABLE = f"{data['schemas'][1]}.{data['table_dds'][3]}"
     spark = SparkSession.builder.master("local[*]").appName("save_file").getOrCreate()
 
     df_orders = spark.read.format('jdbc') \
@@ -23,10 +25,14 @@ def dds_t_dim_orders(logical_date: str):
         "left").select(df_orders["order_id"], df_orders["order_status"], df_orders["order_approved_at"],
                        df_orders["order_delivered_carrier_date"], df_orders["order_delivered_customer_date"],
                        df_orders["order_estimated_delivery_date"], df_orders["order_purchase_timestamp"],
-                       df_order_items["shipping_limit_date"])
+                       df_order_items["shipping_limit_date"], df_orders["logical_date"])
 
-    print(df_dim_orders.count())
-    df_dim_orders.explain(mode="formatted")
+    delete_by_logical_date(DIM_TABLE, logical_date)
+
+    df_dim_orders.write.format("jdbc")\
+        .options(**OPTIONS_WRITE) \
+        .options(dbtable=DIM_TABLE) \
+        .mode("append").save()
 
 
 dds_t_dim_orders(sys.argv[1])

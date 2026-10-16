@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from airflow.sdk import chain
 
 from datetime import datetime
 from pathlib import Path
@@ -11,7 +12,7 @@ def load_yaml():
     with open(PATH_NAME, "r") as f:
         return yaml.load(f, Loader=SafeLoader)
 
-with ((((DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag)))):
+with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag:
 
     data = load_yaml()
     task = []
@@ -19,7 +20,6 @@ with ((((DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) 
 #ну что мне делать.... как мне в future сделать неприрывную обработу ?????
 # если бы это была не учебная работа, как я гарантирую, что у меня будет появляться файл с новыми клиентами ???(города....)
 # для каждой таблицы отдельный даг? или распилить их на entity (мб, надо подумать )
-# или сделать mvp ? потом переделывать много
 
     for i in range(9):
         orders_dataset = SparkSubmitOperator(
@@ -32,7 +32,7 @@ with ((((DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) 
             pool="two_pool"
         )
         task.append(orders_dataset)
-
+# DRY (хотя я мб буду уносить в другие даги)
     dds_t_fact_orders = SparkSubmitOperator(
         task_id=f"dds_t_fact_orders",
         application=data["dag_task"][1],
@@ -104,10 +104,9 @@ with ((((DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) 
         application_args=["{{ ts }}"]
     )
 
-    # ?
-    task >> dds_t_fact_orders >> dds_t_fact_payments
-    dds_t_fact_reviews >> dds_t_dim_orders >> dds_t_df_dim_products
-    dds_t_dim_customers >> dds_t_df_dim_sellers >> dds_t_df_dim_geolocation
+    chain(task, dds_t_fact_orders, dds_t_fact_payments, dds_t_fact_reviews, dds_t_dim_orders,
+          dds_t_df_dim_products, dds_t_dim_customers, dds_t_df_dim_sellers, dds_t_df_dim_geolocation
+          )
 
 
 

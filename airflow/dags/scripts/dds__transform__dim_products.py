@@ -3,10 +3,12 @@ import pyspark.sql.functions as F
 
 import sys
 
-from config import DATA as data, OPTIONS
+from config import DATA as data, OPTIONS, OPTIONS_WRITE
+from connect_db import delete_by_logical_date
 
-# Проверить !!
+
 def dds_t_df_dim_products(logical_date: str):
+    DIM_TABLE = f"{data['schemas'][1]}.{data['table_dds'][4]}"
     spark = SparkSession.builder.master("local[*]").appName("save_file").getOrCreate()
 
     df_products = spark.read.format('jdbc') \
@@ -16,11 +18,14 @@ def dds_t_df_dim_products(logical_date: str):
                                          "product_name_lenght", "product_description_lenght",
                                          "product_photos_qty", "product_weight_g",
                                          "product_length_cm", "product_height_cm",
-                                         "product_width_cm")\
-        .filter("logical_date" >= logical_date)
+                                         "product_width_cm", "logical_date").filter(df_products["logical_date"] >= F.lit(logical_date))
 
-    print(df_dim_products.count())
-    df_dim_products.explain(mode="formatted")
+    delete_by_logical_date(DIM_TABLE, logical_date)
+
+    df_dim_products.write.format("jdbc")\
+        .options(**OPTIONS_WRITE) \
+        .options(dbtable=DIM_TABLE) \
+        .mode("append").save()
 
 
 dds_t_df_dim_products(sys.argv[1])

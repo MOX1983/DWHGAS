@@ -17,6 +17,8 @@ POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 GP_URL = os.getenv("GP_URL") + "/" + POSTGRES_DB
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
 DRIVER = "org.postgresql.Driver"
 
 OPTIONS = {
@@ -25,3 +27,7 @@ OPTIONS = {
     "password": POSTGRES_PASSWORD,
     "driver": DRIVER
 }
+
+OPTIONS_WRITE = dict(OPTIONS)
+OPTIONS_WRITE["batchsize"] = 2000
+OPTIONS_WRITE["reWriteBatchedInserts"] = "true"

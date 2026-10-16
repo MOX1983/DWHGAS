@@ -3,10 +3,12 @@ import pyspark.sql.functions as F
 
 import sys
 
-from config import DATA as data, OPTIONS
+from config import DATA as data, OPTIONS, OPTIONS_WRITE
+from connect_db import delete_by_logical_date
 
-# ПРОВЕРИТЬ !!!!!!!! ПЛАН !!!!!!!! а то мне кажется он все строки читает
+#Вроде норм ...
 def dds_t_fact_orders(logical_date: str):
+    FACT_TABLE = f"{data['schemas'][1]}.{data['table_dds'][0]}"
 
     spark = SparkSession.builder.master("local[*]").appName("save_file").getOrCreate()
 
@@ -21,14 +23,21 @@ def dds_t_fact_orders(logical_date: str):
         (df_orders["order_id"] == df_order_items["order_id"])
         & (df_orders["logical_date"] == df_order_items["logical_date"])
         & (df_orders["logical_date"] == F.lit(logical_date)),
-        "inner").select(df_orders["order_id"], df_order_items["order_item_id"], df_order_items["product_id"],
+        "inner")\
+        .select(df_orders["order_id"], df_order_items["order_item_id"], df_order_items["product_id"],
                         df_order_items["price"], df_order_items["freight_value"], df_orders["customer_id"],
-                        df_order_items["seller_id"])
+                        df_order_items["seller_id"], df_orders["logical_date"])
 
-    print(df_fact_orders.count())
-    df_fact_orders.explain(mode="formatted")
+    # думаю, так неправильно
+    delete_by_logical_date(FACT_TABLE, logical_date)
 
-    # не забыть про идемпотентность on conflict при insert
+    df_fact_orders.write.format("jdbc") \
+        .options(**OPTIONS_WRITE) \
+        .options(dbtable=FACT_TABLE) \
+        .mode("append").save()
+
+    spark.stop()
+
 
 
 

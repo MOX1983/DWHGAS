@@ -7,7 +7,8 @@ create table dds.fact_orders(
 	price decimal(10, 2),
 	freight_value decimal(10, 2),
 	customer_id text,
-	seller_id text
+	seller_id text,
+	logical_date timestamp
 )
 distributed by (order_id);
 
@@ -17,7 +18,8 @@ create table dds.fact_payments(
 	payment_sequential int,
 	payment_type text,
 	payment_installments int,
-	payment_value decimal(10, 2)
+	payment_value decimal(10, 2),
+	logical_date timestamp
 )
 distributed by (order_id);
 
@@ -29,7 +31,8 @@ create table dds.fact_reviews(
 	review_comment_title text,
 	review_comment_message text,
 	review_creation_date timestamp,
-	review_answer_timestamp timestamp
+	review_answer_timestamp timestamp,
+	logical_date timestamp
 )
 distributed by (order_id);
 
@@ -41,7 +44,8 @@ create table dds.dim_orders(
 	order_delivered_customer_date timestamp,
 	order_estimated_delivery_date date, 
 	order_purchase_timestamp timestamp,
-	shipping_limit_date timestamp	
+	shipping_limit_date timestamp,
+	logical_date timestamp
 )
 distributed by (order_id);
 
@@ -54,7 +58,8 @@ create table dds.dim_products(
 	product_weight_g int, 
 	product_length_cm int, 
 	product_height_cm int, 
-	product_width_cm int
+	product_width_cm int,
+	logical_date timestamp
 )
 distributed by (product_id);
 
@@ -63,7 +68,8 @@ create table dds.dim_customers(
 	customer_unique_id text,
 	customer_zip_code_prefix int,
 	customer_city text,
-	customer_state text
+	customer_state text,
+	logical_date timestamp
 )
 distributed by (customer_id);
 
@@ -71,7 +77,8 @@ create table dds.dim_sellers(
 	seller_id text,
 	seller_zip_code_prefix int,
 	seller_city text,
-	seller_state text
+	seller_state text,
+	logical_date timestamp
 )
 distributed by (seller_id);
 
@@ -81,7 +88,8 @@ create table dds.dim_geolocation(
 	geolocation_lat double precision,
 	geolocation_lng double precision,
 	geolocation_city text,
-	geolocation_state text
+	geolocation_state text, 
+	logical_date timestamp
 )
 distributed by (geolocation_city);
 
@@ -89,8 +97,21 @@ distributed by (geolocation_city);
 select *
 from dds.dim_customers dc ;
 
-select *
+select 
 from dds.fact_orders fo ;
+
+select sum(fp.payment_value )
+from dds.fact_payments fp;
+
+delete from dds.dim_customers;
+delete from dds.dim_geolocation;
+delete from dds.dim_orders ;
+delete from dds.dim_products ;
+delete from dds.dim_sellers ;
+delete from dds.fact_orders ;
+delete from dds.fact_payments ;
+delete from dds.fact_reviews ;
+
 
 
 
