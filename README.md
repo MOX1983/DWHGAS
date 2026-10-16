@@ -3,5 +3,4 @@
 **Архитектура**
 ![alt text](image-1.png)
 
-
 Данные взяты с [Kaggle Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce/data?select=olist_orders_dataset.csv)
