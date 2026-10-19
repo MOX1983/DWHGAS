@@ -94,8 +94,10 @@ create table dds.dim_geolocation(
 distributed by (geolocation_city);
 
 
-select count(*)
-from dds.fact_orders fo ;
+select fo.logical_date 
+from dds.fact_orders fo 
+--group by fo.logical_date 
+where fo.logical_date = '2026-10-19 14:18:26.000';
 
 select count(*)
 from dds.dim_orders dio ;

@@ -100,7 +100,6 @@ create table stg.product_category_name_translation(
 distributed randomly;
 
 
-
 select * from stg.orders_dataset;
 select * from stg.customers_dataset;
 select * from stg.products_dataset ;
@@ -152,7 +151,10 @@ where logical_date = '2026-10-16 13:59:07.000';
 
 
 
-
+select oi.order_id, count(*) , count(oi.order_item_id )
+from stg.order_items_dataset oi
+group by oi.order_id 
+having count(*) > 2;
 
 
 
