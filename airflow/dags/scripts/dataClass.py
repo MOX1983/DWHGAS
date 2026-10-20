@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +13,9 @@ PATH_NAME = Path(__file__).parent.parent / "schemas_table_name.yml"
 @dataclass
 class Schema:
     schema: str
+
+    def get_schema(self):
+        return f"{self.schema}."
 
 
 @dataclass
@@ -55,7 +59,7 @@ class File_dataset:
 
 
 @dataclass
-class DAGTask:
+class Task:
     etl_py: str
     transform_py: str
     dds__transform__fact_payments_py: str
@@ -66,40 +70,108 @@ class DAGTask:
     dds__transform__dim_sellers_py: str
     dds__transform__dim_geolocation_py: str
 
+@dataclass
+class DAGTasks:
+    conn_id: str
+    pool: str
+    jars: str
+
+    dag_task: Task
+
+
+@dataclass
+class MinIo:
+    endpoint_url: str
+    access_key: str
+    secret_access_key: str
+
+
+@dataclass
+class DB:
+    dbname: str
+    user: str
+    password: str
+    host: str
+    port: str
+    _url: str
+
+    def get_url(self):
+        return self._url + "/" + self.dbname
+
+
+@dataclass
+class Options:
+    db_config: DB
+    driver: str = "org.postgresql.Driver"
+    batchsize: int = 2000
+    reWriteBatchedInserts: str = "true"
+
+    def get_dict_options(self):
+        return {
+            "url": self.db_config.get_url(),
+            "user": self.db_config.user,
+            "password": self.db_config.password,
+            "driver": self.driver,
+        }
+
+    def get_dict_options_for_write(self):
+        data = self.get_dict_options()
+        data["batchsize"] = self.batchsize
+        data["reWriteBatchedInserts"] = self.reWriteBatchedInserts
+        return data
+
 
 def load_yaml():
     with open(PATH_NAME, "r") as f:
         return yaml.load(f, Loader=SafeLoader)
 
 
+minioConfig = MinIo(
+    os.getenv("ENDPOINT_URL"), os.getenv("ACCESS_KEY"), os.getenv("SECRET_ACCESS_KEY")
+)
+
+db = DB(
+    os.getenv("POSTGRES_DB"),
+    os.getenv("POSTGRES_USER"),
+    os.getenv("POSTGRES_PASSWORD"),
+    os.getenv("HOST"),
+    os.getenv("PORT"),
+    os.getenv("GP_URL"),
+)
+
+optionsConfig = Options(db)
+
 data = load_yaml()
 
-STGschema = StgSchema(
-    Schema(data["schemas"][0]),
-    data["table"][0],
-    data["table"][1],
-    data["table"][2],
-    data["table"][3],
-    data["table"][4],
-    data["table"][5],
-    data["table"][6],
-    data["table"][7],
-    data["table"][8],
+schema_stg_config = Schema(data["schemas"][0])
+schema_dds_config = Schema(data["schemas"][1])
+
+STGschema_config = StgSchema(
+    schema_stg_config,
+    schema_stg_config.get_schema() + data["table"][0],
+    schema_stg_config.get_schema() + data["table"][1],
+    schema_stg_config.get_schema() + data["table"][2],
+    schema_stg_config.get_schema() + data["table"][3],
+    schema_stg_config.get_schema() + data["table"][4],
+    schema_stg_config.get_schema() + data["table"][5],
+    schema_stg_config.get_schema() + data["table"][6],
+    schema_stg_config.get_schema() + data["table"][7],
+    schema_stg_config.get_schema() + data["table"][8],
 )
 
-DDSschema = DdsSchema(
-    Schema(data["schemas"][1]),
-    data["table_dds"][0],
-    data["table_dds"][1],
-    data["table_dds"][2],
-    data["table_dds"][3],
-    data["table_dds"][4],
-    data["table_dds"][5],
-    data["table_dds"][6],
-    data["table_dds"][7],
+DDSschema_config = DdsSchema(
+    schema_dds_config,
+    schema_dds_config.get_schema() + data["table_dds"][0],
+    schema_dds_config.get_schema() + data["table_dds"][1],
+    schema_dds_config.get_schema() + data["table_dds"][2],
+    schema_dds_config.get_schema() + data["table_dds"][3],
+    schema_dds_config.get_schema() + data["table_dds"][4],
+    schema_dds_config.get_schema() + data["table_dds"][5],
+    schema_dds_config.get_schema() + data["table_dds"][6],
+    schema_dds_config.get_schema() + data["table_dds"][7],
 )
 
-DAGtask_file = DAGTask(
+task_file = Task(
     data["dag_task"][0],
     data["dag_task"][1],
     data["dag_task"][2],
@@ -110,3 +182,8 @@ DAGtask_file = DAGTask(
     data["dag_task"][7],
     data["dag_task"][8],
 )
+
+dagConfig = DAGTasks(data["dag_task_config"]["conn_id"],
+                     data["dag_task_config"]["pool"],
+                     data["dag_task_config"]["jars"],
+                     task_file)

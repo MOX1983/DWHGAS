@@ -4,19 +4,16 @@ import pyspark.sql.functions as F
 from connect_db import delete_by_logical_date
 from pyspark.sql import SparkSession
 
-from config import DATA as data
-from config import OPTIONS, OPTIONS_WRITE
+from dataClass import optionsConfig, STGschema_config, DDSschema_config
 
-
-# Проверить !!
 def dds_t_df_dim_geolocation(logical_date: str):
-    DIM_TABLE = f"{data['schemas'][1]}.{data['table_dds'][7]}"
-    spark = SparkSession.builder.master("local[*]").appName("save_file").getOrCreate()
+    DIM_TABLE = DDSschema_config.dim_geolocation
+    spark = SparkSession.builder.master("local[*]").appName("dds_t_df_dim_geolocation").getOrCreate()
 
     df_geolocation = (
         spark.read.format("jdbc")
-        .options(**OPTIONS)
-        .options(dbtable=f"{data['schemas'][0]}.{data['table'][5]}")
+        .options(**optionsConfig.get_dict_options())
+        .options(dbtable=STGschema_config.geolocation_dataset)
         .load()
     )
 
@@ -31,7 +28,7 @@ def dds_t_df_dim_geolocation(logical_date: str):
 
     delete_by_logical_date(DIM_TABLE, logical_date)
 
-    df_dim_geolocation.write.format("jdbc").options(**OPTIONS_WRITE).options(
+    df_dim_geolocation.write.format("jdbc").options(**optionsConfig.get_dict_options_for_write()).options(
         dbtable=DIM_TABLE
     ).mode("append").save()
 

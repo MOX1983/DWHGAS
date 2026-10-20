@@ -4,25 +4,23 @@ import pyspark.sql.functions as F
 from connect_db import delete_by_logical_date
 from pyspark.sql import SparkSession
 
-from config import DATA as data
-from config import OPTIONS, OPTIONS_WRITE
-
+from dataClass import optionsConfig, STGschema_config,DDSschema_config
 
 def dds_t_fact_payments(logical_date: str):
-    FACT_TABLE = f"{data['schemas'][1]}.{data['table_dds'][1]}"
-    spark = SparkSession.builder.master("local[*]").appName("save_file").getOrCreate()
+    FACT_TABLE = DDSschema_config.fact_payments
+    spark = SparkSession.builder.master("local[*]").appName("dds_t_fact_payments").getOrCreate()
 
     df_orders = (
         spark.read.format("jdbc")
-        .options(**OPTIONS)
-        .options(dbtable=f"{data['schemas'][0]}.{data['table'][0]}")
+        .options(**optionsConfig.get_dict_options())
+        .options(dbtable=STGschema_config.orders_dataset)
         .load()
     )
 
     df_payments = (
         spark.read.format("jdbc")
-        .options(**OPTIONS)
-        .options(dbtable=f"{data['schemas'][0]}.{data['table'][6]}")
+        .options(**optionsConfig.get_dict_options())
+        .options(dbtable=STGschema_config.order_payments_dataset)
         .load()
     )
 
@@ -43,7 +41,7 @@ def dds_t_fact_payments(logical_date: str):
 
     delete_by_logical_date(FACT_TABLE, logical_date)
 
-    df_fact_payments.write.format("jdbc").options(**OPTIONS_WRITE).options(
+    df_fact_payments.write.format("jdbc").options(**optionsConfig.get_dict_options_for_write()).options(
         dbtable=FACT_TABLE
     ).mode("append").save()
 
