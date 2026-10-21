@@ -147,7 +147,7 @@ where od.logical_date = '2026-10-15 14:43:12.000';
 
 select sum(o.price + o.freight_value )
 from stg.order_items_dataset o
-where logical_date = '2026-10-16 13:59:07.000';
+where logical_date = '2026-10-20 14:14:48.000';
 
 
 
