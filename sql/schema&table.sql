@@ -156,10 +156,27 @@ from stg.order_items_dataset oi
 group by oi.order_id 
 having count(*) > 2;
 
+select count(distinct o.order_id )
+from stg.order_items_dataset o
+where logical_date = '2026-10-20 14:14:48.000';
+
+select count(distinct opd.order_id )
+from stg.order_payments_dataset opd 
+where logical_date = '2026-10-20 14:14:48.000';
 
 
+select t.order_id, opd.order_id 
+from stg.order_items_dataset t 
+full join stg.order_payments_dataset opd 
+on t.order_id = opd.order_id and t.logical_date = opd.logical_date 
+where t.logical_date = '2026-10-20 14:14:48.000' and (opd.order_id is null or t.order_id is null);
 
 
+select pd.product_id, count(*)
+from stg.products_dataset pd 
+where pd.logical_date = '2026-10-20 14:14:48.000'
+group by pd.product_id 
+having count(*) > 1;
 
 
 

@@ -104,16 +104,16 @@ from dds.fact_orders fo
 where fo.logical_date = '2026-10-20 14:14:48.000';
 
 select count(*)
-from dds.dim_products dp
-where dp.logical_date = '2026-10-20 14:14:48.000';
+from dds.fact_payments fp 
+where fp.logical_date = '2026-10-20 14:14:48.000';
 
 -- в датасет есть дубли id, это надо чистить 
-select fo.order_id, count(*)
-from dds.fact_orders fo
+select fp.order_id, count(*)
+from dds.fact_payments fp
 left join dds.dim_orders t 
-on fo.order_id  = t.order_id  and fo.logical_date = t.logical_date
-where fo.logical_date = '2026-10-20 14:14:48.000'
-group by fo.order_id 
+on fp.order_id  = t.order_id  and fp.logical_date = t.logical_date
+where fp.logical_date = '2026-10-20 14:14:48.000'
+group by fp.order_id 
 having count(*) > 1;
 
 
