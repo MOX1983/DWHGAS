@@ -94,25 +94,45 @@ create table dds.dim_geolocation(
 distributed by (geolocation_city);
 
 
-select count(*)
-from dds.fact_orders fo ;
+select fo.logical_date 
+from dds.fact_orders fo 
+--group by fo.logical_date 
+where fo.logical_date = '2026-10-20 14:14:48.000';
 
 select count(*)
-from dds.dim_orders dio ;
+from dds.fact_orders fo 
+where fo.logical_date = '2026-10-20 14:14:48.000';
+
+select count(*)
+from dds.fact_payments fp 
+where fp.logical_date = '2026-10-20 14:14:48.000';
+
+-- в датасет есть дубли id, это надо чистить 
+select fp.order_id, count(*)
+from dds.fact_payments fp
+left join dds.dim_orders t 
+on fp.order_id  = t.order_id  and fp.logical_date = t.logical_date
+where fp.logical_date = '2026-10-20 14:14:48.000'
+group by fp.order_id 
+having count(*) > 1;
+
 
 select sum(fo.price + fo.freight_value )
 from dds.fact_orders fo 
-where fo.logical_date = '2026-10-16 13:59:07.000';
+where fo.logical_date = '2026-10-20 14:14:48.000';
 
 
-select order_id, count(*) as cnt
-from dds.dim_orders
-where logical_date = '2026-10-16 13:59:07.000'
-group by order_id
+select fo.order_id   , count(*) as cnt
+from dds.fact_orders fo   
+where logical_date = '2026-10-20 14:14:48.000'
+group by fo.order_id 
 having count(*) > 1
 order by cnt desc
 limit 20;
 
+
+select *
+from dds.fact_orders fo ; 
 
 select max(fo.logical_date  )
 from dds.fact_orders fo ;
