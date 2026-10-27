@@ -40,7 +40,7 @@ with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as d
                 STGschema_config.schema.get_schema() + data["table"][i],
                 data["file"][i],
             ],
-            pool=dagConfig.pool,
+            pool=dagConfig.pool
         )
         task.append(orders_dataset)
 
