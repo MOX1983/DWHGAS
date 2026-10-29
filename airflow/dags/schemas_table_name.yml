@@ -45,6 +45,9 @@ dag_task:
   - /opt/airflow/dags/scripts/dds__transform__dim_sellers.py
   - /opt/airflow/dags/scripts/dds__transform__dim_geolocation.py
 
+dq_task:
+  - /opt/airflow/dags/scripts/dq_check/check_balance.py
+
 dag_task_config:
   conn_id: spark_default
   pool: two_pool

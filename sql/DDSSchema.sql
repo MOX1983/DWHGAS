@@ -101,7 +101,7 @@ where fo.logical_date = '2026-10-20 14:14:48.000';
 
 select count(*)
 from dds.fact_orders fo 
-where fo.logical_date = '2026-10-20 14:14:48.000';
+where fo.logical_date = '2026-10-29 14:02:08.000';
 
 select count(*)
 from dds.fact_payments fp 

@@ -71,6 +71,10 @@ class Task:
     dds__transform__dim_geolocation_py: str
 
 @dataclass
+class DqTask:
+    check_balance_py: str
+
+@dataclass
 class DAGTasks:
     conn_id: str
     pool: str
@@ -183,7 +187,11 @@ task_file = Task(
     data["dag_task"][8],
 )
 
+dq_task_file = DqTask(data["dq_task"][0])
+
 dagConfig = DAGTasks(data["dag_task_config"]["conn_id"],
                      data["dag_task_config"]["pool"],
                      data["dag_task_config"]["jars"],
                      task_file)
+
+
