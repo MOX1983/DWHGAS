@@ -8,7 +8,7 @@ from dataClass import optionsConfig, STGschema_config, DDSschema_config
 
 def dds_t_df_dim_sellers(logical_date: str):
     DIM_TABLE = DDSschema_config.dim_sellers
-    spark = SparkSession.builder.master("local[*]").appName("dds_t_df_dim_sellers").getOrCreate()
+    spark = SparkSession.builder.appName("dds_t_df_dim_sellers").getOrCreate()
 
     df_sellers = (
         spark.read.format("jdbc")

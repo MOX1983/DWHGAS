@@ -9,7 +9,7 @@ from dataClass import optionsConfig, STGschema_config,DDSschema_config
 
 def dds_t_fact_reviews(logical_date: str):
     FACT_TABLE = DDSschema_config.fact_reviews
-    spark = SparkSession.builder.master("local[*]").appName("dds_t_fact_reviews").getOrCreate()
+    spark = SparkSession.builder.appName("dds_t_fact_reviews").getOrCreate()
 
     df_orders = (
         spark.read.format("jdbc")

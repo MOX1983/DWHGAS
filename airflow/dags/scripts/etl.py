@@ -1,20 +1,13 @@
-import os
 import sys
-from pathlib import Path
-
 import pyspark.sql.functions as F
-from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 from schemas import SCHEMAS
 from dataClass import minioConfig, optionsConfig
 
-load_dotenv(Path(__file__).parent / ".env")
-
 
 def connect_to_s3(logical_date: str, schema_table_name: str, minio_csv_name: str):
     spark = (
-        SparkSession.builder.master("local[*]")
-        .appName("save_file")
+        SparkSession.builder.appName("save_file")
         .config("spark.hadoop.fs.s3a.endpoint", minioConfig.endpoint_url)
         .config("spark.hadoop.fs.s3a.access.key", minioConfig.access_key)
         .config("spark.hadoop.fs.s3a.secret.key", minioConfig.secret_access_key)

@@ -8,7 +8,7 @@ from dataClass import optionsConfig, STGschema_config, DDSschema_config
 
 def dds_t_df_dim_geolocation(logical_date: str):
     DIM_TABLE = DDSschema_config.dim_geolocation
-    spark = SparkSession.builder.master("local[*]").appName("dds_t_df_dim_geolocation").getOrCreate()
+    spark = SparkSession.builder.appName("dds_t_df_dim_geolocation").getOrCreate()
 
     df_geolocation = (
         spark.read.format("jdbc")
