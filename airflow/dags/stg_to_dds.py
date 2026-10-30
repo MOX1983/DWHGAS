@@ -3,16 +3,9 @@ from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOpe
 from airflow.sdk import chain
 from datetime import datetime
 from scripts.dataClass import dagConfig
+from scripts.decorator import spark_task
 
 
-def spark_task(application: str):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            return func(application=application, *args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as dag:
 

@@ -34,21 +34,28 @@ table_dds:
   - dim_sellers
   - dim_geolocation
 
-dag_task:
-  - /opt/airflow/dags/scripts/etl.py
-  - /opt/airflow/dags/scripts/transform.py
-  - /opt/airflow/dags/scripts/dds__transform__fact_payments.py
-  - /opt/airflow/dags/scripts/dds__transform__fact_reviews.py
-  - /opt/airflow/dags/scripts/dds__transform__dim_orders.py
-  - /opt/airflow/dags/scripts/dds__transform__dim_products.py
-  - /opt/airflow/dags/scripts/dds__transform__dim_customers.py
-  - /opt/airflow/dags/scripts/dds__transform__dim_sellers.py
-  - /opt/airflow/dags/scripts/dds__transform__dim_geolocation.py
 
-dq_task:
-  - /opt/airflow/dags/scripts/dq_check/check_balance.py
-
-dag_task_config:
+DAG:
   conn_id: spark_default
   pool: two_pool
   jars: /home/airflow/.local/lib/python3.10/site-packages/pyspark/jars/postgresql-42.6.0.jar
+  name:
+    - s3_to_gp
+    - dq_check_stg_dds
+    - stg_to_dds
+  task:
+    stg:
+      - /opt/airflow/dags/scripts/etl.py
+      - /opt/airflow/dags/scripts/transform.py
+      - /opt/airflow/dags/scripts/dds__transform__fact_payments.py
+      - /opt/airflow/dags/scripts/dds__transform__fact_reviews.py
+      - /opt/airflow/dags/scripts/dds__transform__dim_orders.py
+      - /opt/airflow/dags/scripts/dds__transform__dim_products.py
+      - /opt/airflow/dags/scripts/dds__transform__dim_customers.py
+      - /opt/airflow/dags/scripts/dds__transform__dim_sellers.py
+      - /opt/airflow/dags/scripts/dds__transform__dim_geolocation.py
+    dq:
+      - /opt/airflow/dags/scripts/
+      - /opt/airflow/dags/scripts/check_balance.py
+    marts:
+      -

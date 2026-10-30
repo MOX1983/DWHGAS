@@ -160,7 +160,7 @@ select count(distinct o.order_id )
 from stg.order_items_dataset o
 where logical_date = '2026-10-20 14:14:48.000';
 
-select count(distinct opd.order_id )
+select count(* )
 from stg.order_payments_dataset opd 
 where logical_date = '2026-10-20 14:14:48.000';
 
@@ -180,8 +180,30 @@ having count(*) > 1;
 
 
 
+select oid., count(*)
+from stg.order_items_dataset oid 
+where od.logical_date = '2026-10-20 14:14:48.000'
+group by od.customer_id 
+having count(*) > 1;
 
 
+select opd.order_id , od.order_id od_id
+from stg.order_payments_dataset opd 
+right join stg.orders_dataset od 
+on opd.order_id  = od.order_id and opd.logical_date = od.logical_date 
+where opd.logical_date = '2026-10-20 14:14:48.000'
+and opd.order_id is null;
+
+select count(*)
+from stg.order_payments_dataset opd 
+left join stg.orders_dataset od 
+on opd.order_id  = od.order_id and opd.logical_date = od.logical_date 
+where opd.logical_date = '2026-10-29 15:20:54.000'
+and od.order_id is null;
+
+
+select max(opd.logical_date )
+from stg.order_payments_dataset opd ;
 
 
 

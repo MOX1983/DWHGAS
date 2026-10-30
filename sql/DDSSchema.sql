@@ -107,14 +107,22 @@ select count(*)
 from dds.fact_payments fp 
 where fp.logical_date = '2026-10-20 14:14:48.000';
 
--- в датасет есть дубли id, это надо чистить 
-select fp.order_id, count(*)
+
+select fp.order_id, t.order_id 
 from dds.fact_payments fp
 left join dds.dim_orders t 
 on fp.order_id  = t.order_id  and fp.logical_date = t.logical_date
-where fp.logical_date = '2026-10-20 14:14:48.000'
-group by fp.order_id 
-having count(*) > 1;
+where fp.logical_date = '2026-10-30 12:25:11.000';
+
+select count(*)
+from dds.fact_payments fp
+left join dds.dim_orders t 
+on fp.order_id  = t.order_id  and fp.logical_date = t.logical_date
+where fp.logical_date = '2026-10-29 15:20:54.000'
+and t.order_id is null;
+
+select max(t.logical_date )
+from dds.dim_orders t;
 
 
 select sum(fo.price + fo.freight_value )

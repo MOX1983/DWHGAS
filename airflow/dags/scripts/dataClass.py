@@ -80,8 +80,14 @@ class DAGTasks:
     pool: str
     jars: str
 
-    dag_task: Task
+    dag_task: Task | DqTask
 
+# возможно лучше сделать через лист но в DAGTasks, ибо много классов
+@dataclass
+class DagName:
+    s3_to_gp : str
+    dq_check_stg_dds : str
+    stg_to_dds : str
 
 @dataclass
 class MinIo:
@@ -175,23 +181,31 @@ DDSschema_config = DdsSchema(
     schema_dds_config.get_schema() + data["table_dds"][7],
 )
 
+
 task_file = Task(
-    data["dag_task"][0],
-    data["dag_task"][1],
-    data["dag_task"][2],
-    data["dag_task"][3],
-    data["dag_task"][4],
-    data["dag_task"][5],
-    data["dag_task"][6],
-    data["dag_task"][7],
-    data["dag_task"][8],
+    data["DAG"]["task"]["stg"][0],
+    data["DAG"]["task"]["stg"][1],
+    data["DAG"]["task"]["stg"][2],
+    data["DAG"]["task"]["stg"][3],
+    data["DAG"]["task"]["stg"][4],
+    data["DAG"]["task"]["stg"][5],
+    data["DAG"]["task"]["stg"][6],
+    data["DAG"]["task"]["stg"][7],
+    data["DAG"]["task"]["stg"][8],
 )
 
-dq_task_file = DqTask(data["dq_task"][0])
+dq_task_file = DqTask(data["DAG"]["task"]["dq"][0])
 
-dagConfig = DAGTasks(data["dag_task_config"]["conn_id"],
-                     data["dag_task_config"]["pool"],
-                     data["dag_task_config"]["jars"],
+dagConfig = DAGTasks(data["DAG"]["conn_id"],
+                     data["DAG"]["pool"],
+                     data["DAG"]["jars"],
                      task_file)
 
+dagDqConfig = DAGTasks(data["DAG"]["conn_id"],
+                       data["DAG"]["pool"],
+                       data["DAG"]["jars"],
+                       dq_task_file)
 
+dag_name = DagName(data["DAG"]["name"][0],
+                   data["DAG"]["name"][1],
+                   data["DAG"]["name"][2])
