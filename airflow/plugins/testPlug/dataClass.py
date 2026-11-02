@@ -5,10 +5,14 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 from yaml.loader import SafeLoader
-
-load_dotenv(Path(__file__).parent / ".env")
-PATH_NAME = Path(__file__).parent.parent / "schemas_table_name.yml"
-
+# Это тест
+# BASE_DIR = Path(os.getenv("AIRFLOW_PROJ_DIR", Path(__file__).parent.parent))
+# load_dotenv(BASE_DIR / "scripts/.env")
+# PATH_NAME = BASE_DIR / "config/schemas_table_name.yml"
+# PATH_NAME_DQ = BASE_DIR / "config/dq_check.yml"
+load_dotenv("/opt/airflow/scripts/.env")
+PATH_NAME = "/opt/airflow/config/schemas_table_name.yml"
+PATH_NAME_DQ = "/opt/airflow/config/dq_check.yml"
 
 @dataclass
 class Schema:
@@ -72,7 +76,9 @@ class Task:
 
 @dataclass
 class DqTask:
+    check_null_py: str
     check_balance_py: str
+
 
 @dataclass
 class DAGTasks:
@@ -131,8 +137,8 @@ class Options:
         return data
 
 
-def load_yaml():
-    with open(PATH_NAME, "r") as f:
+def load_yaml(path: str):
+    with open(path, "r") as f:
         return yaml.load(f, Loader=SafeLoader)
 
 
@@ -151,7 +157,7 @@ db = DB(
 
 optionsConfig = Options(db)
 
-data = load_yaml()
+data = load_yaml(str(PATH_NAME))
 
 schema_stg_config = Schema(data["schemas"][0])
 schema_dds_config = Schema(data["schemas"][1])
@@ -194,7 +200,8 @@ task_file = Task(
     data["DAG"]["task"]["stg"][8],
 )
 
-dq_task_file = DqTask(data["DAG"]["task"]["dq"][0])
+dq_task_file = DqTask(data["DAG"]["task"]["dq"][0],
+                      data["DAG"]["task"]["dq"][1])
 
 dagConfig = DAGTasks(data["DAG"]["conn_id"],
                      data["DAG"]["pool"],
@@ -209,3 +216,13 @@ dagDqConfig = DAGTasks(data["DAG"]["conn_id"],
 dag_name = DagName(data["DAG"]["name"][0],
                    data["DAG"]["name"][1],
                    data["DAG"]["name"][2])
+
+
+@dataclass
+class DqCheck:
+    table: list
+    limits: list
+
+data_dq = load_yaml(str(PATH_NAME_DQ))
+dqCheckStg = DqCheck(data_dq["schemas"]["stg"], data_dq["limits"])
+

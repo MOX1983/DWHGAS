@@ -1,0 +1,23 @@
+schemas:
+  stg:
+    - name: orders_dataset
+      columns:
+        - order_id
+        - customer_id
+        - order_status
+    - table: customers_dataset
+      columns:
+        - customer_id
+        - customer_unique_id
+    - table: order_items_dataset
+      columns:
+        - order_id
+        - order_item_id
+        - product_id
+        - seller_id
+        - price
+        - freight_value
+
+
+limits:
+  - not_null: 0.01

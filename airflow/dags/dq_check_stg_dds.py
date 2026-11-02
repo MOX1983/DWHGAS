@@ -2,24 +2,22 @@ from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.sdk import chain
-from scripts.dataClass import dagDqConfig, dag_name
-from scripts.decorator import spark_task
+from testPlug import dagDqConfig, dag_name, STGschema_config
+from testPlug import spark_task
 from datetime import datetime
 
 
 with DAG(dag_id="dq_check_stg_dds", start_date=datetime(2026, 1, 1), catchup=False) as dag:
-# я гений...
-# надо переделать удаление нулевых и чего-то ещё
 
-    @spark_task(application=dagDqConfig.dag_task.check_balance_py)
-    def check_balans__fact_orders__order_items_dataset(application: str):
+    @spark_task(application=dagDqConfig.dag_task.check_null_py)
+    def check_null__stg_orders_dataset(application: str):
         return SparkSubmitOperator(
-            task_id="check_balans__fact_orders__order_items_dataset",
+            task_id="check_null__stg_orders_dataset",
             application=application,
             conn_id=dagDqConfig.conn_id,
             pool=dagDqConfig.pool,
             jars=dagDqConfig.jars,
-            application_args=["{{ ts }}"]
+            application_args=["{{ ts }}", STGschema_config.orders_dataset]
         )
 
     trigger__stg_to_dds = TriggerDagRunOperator(
@@ -30,6 +28,6 @@ with DAG(dag_id="dq_check_stg_dds", start_date=datetime(2026, 1, 1), catchup=Fal
 
 
     chain(
-        check_balans__fact_orders__order_items_dataset(),
+        check_null__stg_orders_dataset(),
         trigger__stg_to_dds
     )

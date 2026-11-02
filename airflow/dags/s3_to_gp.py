@@ -1,23 +1,17 @@
 from datetime import datetime
 from pathlib import Path
 
-import yaml
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from scripts.dataClass import dagConfig, STGschema_config, dag_name
-from yaml.loader import SafeLoader
+from testPlug import dagConfig, STGschema_config, dag_name, load_yaml
 
-PATH_NAME = Path(__file__).parent / "schemas_table_name.yml"
-
-
-def load_yaml():
-    with open(PATH_NAME, "r") as f:
-        return yaml.load(f, Loader=SafeLoader)
-
+# тест
+# PATH_NAME = Path(__file__).parent / "config/schemas_table_name.yml"
+PATH_NAME = "/opt/airflow/config/schemas_table_name.yml"
 
 with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag:
-    data = load_yaml()
+    data = load_yaml(str(PATH_NAME))
     task = []
 
     for i in range(9):

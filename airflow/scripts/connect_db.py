@@ -1,7 +1,8 @@
 import psycopg2
 
-from dataClass import db
+from plugins.testPlug.dataClass import db
 def delete_by_logical_date(name_table: str, logical_date: str):
+    # использовать хуки?
     conn = psycopg2.connect(
         host=db.host,
         port=db.port,

@@ -2,8 +2,7 @@ from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.sdk import chain
 from datetime import datetime
-from scripts.dataClass import dagConfig
-from scripts.decorator import spark_task
+from testPlug import dagConfig, spark_task
 
 
 
@@ -101,12 +100,12 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
         )
 
     chain(
-        [dds_t_fact_orders(),
+        dds_t_fact_orders(),
         dds_t_fact_payments(),
         dds_t_fact_reviews(),
         dds_t_dim_orders(),
         dds_t_df_dim_products(),
         dds_t_dim_customers(),
         dds_t_df_dim_sellers(),
-        dds_t_df_dim_geolocation()]
+        dds_t_df_dim_geolocation()
     )

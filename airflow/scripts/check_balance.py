@@ -1,7 +1,7 @@
 import sys
 import pyspark.sql.functions as F
 from pyspark.sql import SparkSession
-from dataClass import optionsConfig, DDSschema_config, STGschema_config
+from plugins.testPlug.dataClass import optionsConfig, DDSschema_config, STGschema_config
 
 # я оставлю этот гениальный шаг
 # сравнение не реализованно , сравнивать distinct key
