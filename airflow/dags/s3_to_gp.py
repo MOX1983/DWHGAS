@@ -1,17 +1,13 @@
 from datetime import datetime
-from pathlib import Path
 
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from testPlug import dagConfig, STGschema_config, dag_name, load_yaml
+from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+from testPlug import dagConfig, STGschema_config, load_yaml, PATH_NAME, dag_name, path_dataClass
 
-# тест
-# PATH_NAME = Path(__file__).parent / "config/schemas_table_name.yml"
-PATH_NAME = "/opt/airflow/config/schemas_table_name.yml"
 
-with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag:
-    data = load_yaml(str(PATH_NAME))
+with (DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag):
+    data = load_yaml(PATH_NAME)
     task = []
 
     for i in range(9):
@@ -24,7 +20,8 @@ with DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as d
                 STGschema_config.schema.get_schema() + data["table"][i],
                 data["file"][i],
             ],
-            pool=dagConfig.pool
+            pool=dagConfig.pool,
+            py_files= path_dataClass.path_to_class
         )
         task.append(orders_dataset)
 

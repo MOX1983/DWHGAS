@@ -2,7 +2,7 @@ import sys
 import pyspark.sql.functions as F
 from pyspark.sql import SparkSession
 from schemas import SCHEMAS
-from plugins.testPlug.dataClass import minioConfig, optionsConfig
+from dataClass import minioConfig, optionsConfig
 
 
 def connect_to_s3(logical_date: str, schema_table_name: str, minio_csv_name: str):
@@ -19,7 +19,7 @@ def connect_to_s3(logical_date: str, schema_table_name: str, minio_csv_name: str
     df = (
         spark.read.option("header", "true")
         .schema(schema)
-        .csv(f"s3a://raw/{minio_csv_name}.csv")
+        .csv(f"s3a://{minioConfig.bucket_name}/{minio_csv_name}.csv")
         .withColumn("logical_date", F.to_timestamp(F.lit(logical_date)))
         .coalesce(1)
     )

@@ -2,8 +2,7 @@ from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.sdk import chain
-from testPlug import dagDqConfig, dag_name, STGschema_config
-from testPlug import spark_task
+from testPlug import dagDqConfig, dag_name, STGschema_config, spark_task, path_dataClass
 from datetime import datetime
 
 
@@ -17,7 +16,8 @@ with DAG(dag_id="dq_check_stg_dds", start_date=datetime(2026, 1, 1), catchup=Fal
             conn_id=dagDqConfig.conn_id,
             pool=dagDqConfig.pool,
             jars=dagDqConfig.jars,
-            application_args=["{{ ts }}", STGschema_config.orders_dataset]
+            application_args=["{{ ts }}", STGschema_config.orders_dataset],
+            py_files=path_dataClass.path_to_class
         )
 
     trigger__stg_to_dds = TriggerDagRunOperator(

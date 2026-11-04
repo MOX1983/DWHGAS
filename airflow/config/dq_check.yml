@@ -1,16 +1,13 @@
 schemas:
   stg:
-    - name: orders_dataset
-      columns:
+    stg.orders_dataset:
         - order_id
         - customer_id
         - order_status
-    - table: customers_dataset
-      columns:
+    stg.customers_dataset:
         - customer_id
         - customer_unique_id
-    - table: order_items_dataset
-      columns:
+    stg.order_items_dataset:
         - order_id
         - order_item_id
         - product_id
@@ -20,4 +17,4 @@ schemas:
 
 
 limits:
-  - not_null: 0.01
+  not_null: 0.01

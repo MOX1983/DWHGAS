@@ -4,7 +4,7 @@ import pyspark.sql.functions as F
 from connect_db import delete_by_logical_date
 from pyspark.sql import SparkSession
 
-from plugins.testPlug.dataClass import optionsConfig, STGschema_config, DDSschema_config
+from dags.testPlug import optionsConfig, STGschema_config, DDSschema_config
 
 def dds_t_df_dim_sellers(logical_date: str):
     DIM_TABLE = DDSschema_config.dim_sellers

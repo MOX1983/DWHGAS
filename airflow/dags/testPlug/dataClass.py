@@ -5,14 +5,18 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 from yaml.loader import SafeLoader
-# Это тест
-# BASE_DIR = Path(os.getenv("AIRFLOW_PROJ_DIR", Path(__file__).parent.parent))
-# load_dotenv(BASE_DIR / "scripts/.env")
-# PATH_NAME = BASE_DIR / "config/schemas_table_name.yml"
-# PATH_NAME_DQ = BASE_DIR / "config/dq_check.yml"
-load_dotenv("/opt/airflow/scripts/.env")
-PATH_NAME = "/opt/airflow/config/schemas_table_name.yml"
-PATH_NAME_DQ = "/opt/airflow/config/dq_check.yml"
+
+load_dotenv()
+BASE_DIR = os.getenv("AIRFLOW_HOME") + "/"
+
+load_dotenv(BASE_DIR + "scripts/.env")
+PATH_NAME = BASE_DIR + "config/schemas_table_name.yml"
+PATH_NAME_DQ = BASE_DIR + "config/dq_check.yml"
+
+@dataclass
+class DataClass:
+    path_to_class: str = "dags/testPlug/dataClass.py"
+
 
 @dataclass
 class Schema:
@@ -91,15 +95,16 @@ class DAGTasks:
 # возможно лучше сделать через лист но в DAGTasks, ибо много классов
 @dataclass
 class DagName:
-    s3_to_gp : str
-    dq_check_stg_dds : str
-    stg_to_dds : str
+    s3_to_gp: str
+    dq_check_stg_dds: str
+    stg_to_dds: str
 
 @dataclass
 class MinIo:
     endpoint_url: str
     access_key: str
     secret_access_key: str
+    bucket_name: str
 
 
 @dataclass
@@ -141,9 +146,10 @@ def load_yaml(path: str):
     with open(path, "r") as f:
         return yaml.load(f, Loader=SafeLoader)
 
+path_dataClass = DataClass()
 
 minioConfig = MinIo(
-    os.getenv("ENDPOINT_URL"), os.getenv("ACCESS_KEY"), os.getenv("SECRET_ACCESS_KEY")
+    os.getenv("ENDPOINT_URL"), os.getenv("ACCESS_KEY"), os.getenv("SECRET_ACCESS_KEY"), os.getenv("BUCKET_NAME")
 )
 
 db = DB(
@@ -225,4 +231,5 @@ class DqCheck:
 
 data_dq = load_yaml(str(PATH_NAME_DQ))
 dqCheckStg = DqCheck(data_dq["schemas"]["stg"], data_dq["limits"])
+
 

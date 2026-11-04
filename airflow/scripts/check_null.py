@@ -1,7 +1,7 @@
 import sys
 import pyspark.sql.functions as F
 from pyspark.sql import SparkSession
-from plugins.testPlug.dataClass import optionsConfig, dqCheckStg
+from dataClass import optionsConfig, dqCheckStg
 
 def check_null_stg_dds(logical_date: str, table_name: str):
     # отличная идея взять для dwh данные которые нудны для аналитиков
@@ -12,15 +12,16 @@ def check_null_stg_dds(logical_date: str, table_name: str):
     df_order = spark.read.format("jdbc").options(**optionsConfig.get_dict_options())\
         .options(dbtable=table_name).load()
 
-    columns = dqCheckStg.table["table_name"]
+    columns = dqCheckStg.table[table_name]
     limit = dqCheckStg.limits["not_null"]
 
     df_order = df_order.filter(F.col("logical_date") == F.lit(logical_date))
 
     for i in columns:
         try:
-            res = df_order.select(F.count(F.when(F.col(i).isNull())).alias(f"cnt"))
-            print(f"{table_name}{i} \t {res}")
+            # второй способ через filter().count()
+            res = df_order.select(F.count(F.when(F.col(i).isNull(), i)).alias("cnt")).collect()
+            print(f"{table_name} {i} \t {res}")
             if res >= limit:
                 raise Exception(f"count null row in table {table_name} column {i} > limit")
         except Exception as e:

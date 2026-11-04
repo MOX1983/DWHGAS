@@ -206,6 +206,16 @@ select max(opd.logical_date )
 from stg.order_payments_dataset opd ;
 
 
+select count(*)
+from stg.orders_dataset od 
+where logical_date = '2026-10-30 12:25:11.000';
+
+select count(*)
+from stg.orders_dataset od 
+where logical_date = '2026-10-30 12:25:11.000'
+and od.order_id is null;
+
+
 
 
 

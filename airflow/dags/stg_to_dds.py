@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.sdk import chain
 from datetime import datetime
-from testPlug import dagConfig, spark_task
+from testPlug import dagConfig, spark_task, path_dataClass
 
 
 
@@ -18,6 +18,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     @spark_task(application=dagConfig.dag_task.dds__transform__fact_payments_py)
@@ -29,6 +30,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     @spark_task(application=dagConfig.dag_task.dds__transform__fact_reviews_py)
@@ -40,6 +42,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     @spark_task(application=dagConfig.dag_task.dds__transform__dim_orders_py)
@@ -51,6 +54,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     @spark_task(application=dagConfig.dag_task.dds__transform__dim_products_py)
@@ -62,6 +66,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     @spark_task(application=dagConfig.dag_task.dds__transform__dim_customers_py)
@@ -73,6 +78,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
 
@@ -85,6 +91,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
 
@@ -97,6 +104,7 @@ with DAG(dag_id="stg_to_dds", start_date=datetime(2026, 1, 1), catchup=False) as
             pool=dagConfig.pool,
             jars=dagConfig.jars,
             application_args=["{{ ts }}"],
+            py_files=path_dataClass.path_to_class
         )
 
     chain(
