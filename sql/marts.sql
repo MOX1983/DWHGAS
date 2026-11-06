@@ -19,7 +19,7 @@ on fo.product_id = dp.product_id and fo.logical_date = dp.logical_date;
 
 refresh materialized view marts.mv_orders_items_payments;
 
-drop view marts.v_orders_items_payments;
+drop view if exists marts.v_orders_items_payments;
 
 create view marts.v_orders_items_payments as 
 select * from marts.mv_orders_items_payments;
@@ -46,7 +46,6 @@ select count(*)
 from dds.fact_orders fo 
 where fo.logical_date = '2026-10-20 14:14:48.000';
 
--- test mv
 
 
 

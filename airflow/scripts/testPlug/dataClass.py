@@ -15,7 +15,7 @@ PATH_NAME_DQ = BASE_DIR + "config/dq_check.yml"
 
 @dataclass
 class DataClass:
-    path_to_class: str = "dags/testPlug/dataClass.py"
+    path_to_class: str = "/testPlug/dataClass.py"
 
 
 @dataclass
@@ -51,6 +51,12 @@ class DdsSchema:
     dim_customers: str
     dim_sellers: str
     dim_geolocation: str
+
+@dataclass
+class MartsSchema:
+    schema: Schema
+    mv: list
+    v: list
 
 
 @dataclass
@@ -98,6 +104,8 @@ class DagName:
     s3_to_gp: str
     dq_check_stg_dds: str
     stg_to_dds: str
+    dq_check_dds_marts : str # это на future
+    mart_mv: str
 
 @dataclass
 class MinIo:
@@ -167,6 +175,7 @@ data = load_yaml(str(PATH_NAME))
 
 schema_stg_config = Schema(data["schemas"][0])
 schema_dds_config = Schema(data["schemas"][1])
+schema_marts_config = Schema(data["schemas"][2])
 
 STGschema_config = StgSchema(
     schema_stg_config,
@@ -191,6 +200,12 @@ DDSschema_config = DdsSchema(
     schema_dds_config.get_schema() + data["table_dds"][5],
     schema_dds_config.get_schema() + data["table_dds"][6],
     schema_dds_config.get_schema() + data["table_dds"][7],
+)
+
+marts_schema_config = MartsSchema(
+    schema_marts_config,
+    [schema_marts_config.get_schema() + name for name in data["marts"]["mv"]],
+    [schema_marts_config.get_schema() + name for name in data["marts"]["v"]]
 )
 
 
@@ -221,7 +236,9 @@ dagDqConfig = DAGTasks(data["DAG"]["conn_id"],
 
 dag_name = DagName(data["DAG"]["name"][0],
                    data["DAG"]["name"][1],
-                   data["DAG"]["name"][2])
+                   data["DAG"]["name"][2],
+                   data["DAG"]["name"][3],
+                   data["DAG"]["name"][4])
 
 
 @dataclass

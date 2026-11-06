@@ -4,7 +4,7 @@ import pyspark.sql.functions as F
 from connect_db import delete_by_logical_date
 from pyspark.sql import SparkSession
 
-from dataClass import STGschema_config, DDSschema_config, optionsConfig
+from testPlug import STGschema_config, DDSschema_config, optionsConfig
 
 def dds_t_fact_orders(logical_date: str):
     FACT_TABLE = DDSschema_config.fact_orders

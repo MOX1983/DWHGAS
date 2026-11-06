@@ -18,3 +18,4 @@ schemas:
 
 limits:
   not_null: 0.01
+  check_balance: 0.001

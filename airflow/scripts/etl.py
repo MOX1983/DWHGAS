@@ -2,7 +2,7 @@ import sys
 import pyspark.sql.functions as F
 from pyspark.sql import SparkSession
 from schemas import SCHEMAS
-from dataClass import minioConfig, optionsConfig
+from testPlug import minioConfig, optionsConfig
 
 
 def connect_to_s3(logical_date: str, schema_table_name: str, minio_csv_name: str):

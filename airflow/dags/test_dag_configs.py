@@ -1,10 +1,8 @@
 from datetime import datetime
-from pathlib import Path
 
-import os
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator
-from testPlug import dagConfig, STGschema_config, dag_name, load_yaml
+from testPlug import dag_name
 
 
 def test_path():

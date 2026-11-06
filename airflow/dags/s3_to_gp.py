@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
-from testPlug import dagConfig, STGschema_config, load_yaml, PATH_NAME, dag_name, path_dataClass
+from testPlug import dagConfig, STGschema_config, load_yaml, PATH_NAME, dag_name
 
 
 with (DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as dag):
@@ -20,8 +20,7 @@ with (DAG(dag_id="s3_to_gp", start_date=datetime(2026, 1, 1), catchup=False) as 
                 STGschema_config.schema.get_schema() + data["table"][i],
                 data["file"][i],
             ],
-            pool=dagConfig.pool,
-            py_files= path_dataClass.path_to_class
+            pool=dagConfig.pool
         )
         task.append(orders_dataset)
 

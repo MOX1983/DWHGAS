@@ -1,6 +1,7 @@
 schemas:
   - stg
   - dds
+  - marts
 
 table:
   - orders_dataset
@@ -34,6 +35,12 @@ table_dds:
   - dim_sellers
   - dim_geolocation
 
+marts:
+  mv:
+    - mv_orders_items_payments
+  v:
+    - v_orders_items_payments
+
 
 DAG:
   conn_id: spark_default
@@ -43,6 +50,8 @@ DAG:
     - s3_to_gp
     - dq_check_stg_dds
     - stg_to_dds
+    - dq_check_dds_marts
+    - mart_mv
   task:
     stg:
       - /opt/airflow/scripts/etl.py
