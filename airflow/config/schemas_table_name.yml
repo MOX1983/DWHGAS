@@ -1,0 +1,71 @@
+schemas:
+  - stg
+  - dds
+  - marts
+
+table:
+  - orders_dataset
+  - customers_dataset
+  - order_items_dataset
+  - products_dataset
+  - sellers_dataset
+  - geolocation_dataset
+  - order_payments_dataset
+  - order_reviews_dataset
+  - product_category_name_translation
+
+file:
+  - olist_orders_dataset
+  - olist_customers_dataset
+  - olist_order_items_dataset
+  - olist_products_dataset
+  - olist_sellers_dataset
+  - olist_geolocation_dataset
+  - olist_order_payments_dataset
+  - olist_order_reviews_dataset
+  - product_category_name_translation
+
+table_dds:
+  - fact_orders
+  - fact_payments
+  - fact_reviews
+  - dim_orders
+  - dim_products
+  - dim_customers
+  - dim_sellers
+  - dim_geolocation
+
+marts:
+  mv:
+    - mv_orders_items_payments
+  v:
+    - v_orders_items_payments
+
+
+DAG:
+  conn_id: spark_default
+  pool: two_pool
+  jars: /home/airflow/.local/lib/python3.10/site-packages/pyspark/jars/postgresql-42.6.0.jar
+  name:
+    - s3_to_gp
+    - dq_check_stg_dds
+    - stg_to_dds
+    - dq_check_dds_marts
+    - mart_mv
+  task:
+    stg:
+      - /opt/airflow/scripts/etl.py
+      - /opt/airflow/scripts/transform.py
+      - /opt/airflow/scripts/dds__transform__fact_payments.py
+      - /opt/airflow/scripts/dds__transform__fact_reviews.py
+      - /opt/airflow/scripts/dds__transform__dim_orders.py
+      - /opt/airflow/scripts/dds__transform__dim_products.py
+      - /opt/airflow/scripts/dds__transform__dim_customers.py
+      - /opt/airflow/scripts/dds__transform__dim_sellers.py
+      - /opt/airflow/scripts/dds__transform__dim_geolocation.py
+    dq:
+      - /opt/airflow/scripts/check_null.py
+      - /opt/airflow/scripts/check_balance.py
+      - /opt/airflow/scripts/
+    marts:
+      -

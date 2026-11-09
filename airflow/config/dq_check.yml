@@ -1,0 +1,21 @@
+schemas:
+  stg:
+    stg.orders_dataset:
+        - order_id
+        - customer_id
+        - order_status
+    stg.customers_dataset:
+        - customer_id
+        - customer_unique_id
+    stg.order_items_dataset:
+        - order_id
+        - order_item_id
+        - product_id
+        - seller_id
+        - price
+        - freight_value
+
+
+limits:
+  not_null: 0.01
+  check_balance: 0.001

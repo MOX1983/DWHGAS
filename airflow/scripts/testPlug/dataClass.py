@@ -6,8 +6,16 @@ import yaml
 from dotenv import load_dotenv
 from yaml.loader import SafeLoader
 
-load_dotenv(Path(__file__).parent / ".env")
-PATH_NAME = Path(__file__).parent.parent / "schemas_table_name.yml"
+load_dotenv()
+BASE_DIR = os.getenv("AIRFLOW_HOME") + "/"
+
+load_dotenv(BASE_DIR + "scripts/.env")
+PATH_NAME = BASE_DIR + "config/schemas_table_name.yml"
+PATH_NAME_DQ = BASE_DIR + "config/dq_check.yml"
+
+@dataclass
+class DataClass:
+    path_to_class: str = "/testPlug/dataClass.py"
 
 
 @dataclass
@@ -44,6 +52,12 @@ class DdsSchema:
     dim_sellers: str
     dim_geolocation: str
 
+@dataclass
+class MartsSchema:
+    schema: Schema
+    mv: list
+    v: list
+
 
 @dataclass
 class File_dataset:
@@ -71,19 +85,34 @@ class Task:
     dds__transform__dim_geolocation_py: str
 
 @dataclass
+class DqTask:
+    check_null_py: str
+    check_balance_py: str
+
+
+@dataclass
 class DAGTasks:
     conn_id: str
     pool: str
     jars: str
 
-    dag_task: Task
+    dag_task: Task | DqTask
 
+# возможно лучше сделать через лист но в DAGTasks, ибо много классов
+@dataclass
+class DagName:
+    s3_to_gp: str
+    dq_check_stg_dds: str
+    stg_to_dds: str
+    dq_check_dds_marts : str # это на future
+    mart_mv: str
 
 @dataclass
 class MinIo:
     endpoint_url: str
     access_key: str
     secret_access_key: str
+    bucket_name: str
 
 
 @dataclass
@@ -121,13 +150,14 @@ class Options:
         return data
 
 
-def load_yaml():
-    with open(PATH_NAME, "r") as f:
+def load_yaml(path: str):
+    with open(path, "r") as f:
         return yaml.load(f, Loader=SafeLoader)
 
+path_dataClass = DataClass()
 
 minioConfig = MinIo(
-    os.getenv("ENDPOINT_URL"), os.getenv("ACCESS_KEY"), os.getenv("SECRET_ACCESS_KEY")
+    os.getenv("ENDPOINT_URL"), os.getenv("ACCESS_KEY"), os.getenv("SECRET_ACCESS_KEY"), os.getenv("BUCKET_NAME")
 )
 
 db = DB(
@@ -141,10 +171,11 @@ db = DB(
 
 optionsConfig = Options(db)
 
-data = load_yaml()
+data = load_yaml(str(PATH_NAME))
 
 schema_stg_config = Schema(data["schemas"][0])
 schema_dds_config = Schema(data["schemas"][1])
+schema_marts_config = Schema(data["schemas"][2])
 
 STGschema_config = StgSchema(
     schema_stg_config,
@@ -171,19 +202,51 @@ DDSschema_config = DdsSchema(
     schema_dds_config.get_schema() + data["table_dds"][7],
 )
 
-task_file = Task(
-    data["dag_task"][0],
-    data["dag_task"][1],
-    data["dag_task"][2],
-    data["dag_task"][3],
-    data["dag_task"][4],
-    data["dag_task"][5],
-    data["dag_task"][6],
-    data["dag_task"][7],
-    data["dag_task"][8],
+marts_schema_config = MartsSchema(
+    schema_marts_config,
+    [schema_marts_config.get_schema() + name for name in data["marts"]["mv"]],
+    [schema_marts_config.get_schema() + name for name in data["marts"]["v"]]
 )
 
-dagConfig = DAGTasks(data["dag_task_config"]["conn_id"],
-                     data["dag_task_config"]["pool"],
-                     data["dag_task_config"]["jars"],
+
+task_file = Task(
+    data["DAG"]["task"]["stg"][0],
+    data["DAG"]["task"]["stg"][1],
+    data["DAG"]["task"]["stg"][2],
+    data["DAG"]["task"]["stg"][3],
+    data["DAG"]["task"]["stg"][4],
+    data["DAG"]["task"]["stg"][5],
+    data["DAG"]["task"]["stg"][6],
+    data["DAG"]["task"]["stg"][7],
+    data["DAG"]["task"]["stg"][8],
+)
+
+dq_task_file = DqTask(data["DAG"]["task"]["dq"][0],
+                      data["DAG"]["task"]["dq"][1])
+
+dagConfig = DAGTasks(data["DAG"]["conn_id"],
+                     data["DAG"]["pool"],
+                     data["DAG"]["jars"],
                      task_file)
+
+dagDqConfig = DAGTasks(data["DAG"]["conn_id"],
+                       data["DAG"]["pool"],
+                       data["DAG"]["jars"],
+                       dq_task_file)
+
+dag_name = DagName(data["DAG"]["name"][0],
+                   data["DAG"]["name"][1],
+                   data["DAG"]["name"][2],
+                   data["DAG"]["name"][3],
+                   data["DAG"]["name"][4])
+
+
+@dataclass
+class DqCheck:
+    table: list
+    limits: list
+
+data_dq = load_yaml(str(PATH_NAME_DQ))
+dqCheckStg = DqCheck(data_dq["schemas"]["stg"], data_dq["limits"])
+
+

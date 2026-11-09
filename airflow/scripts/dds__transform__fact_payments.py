@@ -4,11 +4,11 @@ import pyspark.sql.functions as F
 from connect_db import delete_by_logical_date
 from pyspark.sql import SparkSession
 
-from dataClass import optionsConfig, STGschema_config,DDSschema_config
+from testPlug import optionsConfig, STGschema_config,DDSschema_config
 
 def dds_t_fact_payments(logical_date: str):
     FACT_TABLE = DDSschema_config.fact_payments
-    spark = SparkSession.builder.master("local[*]").appName("dds_t_fact_payments").getOrCreate()
+    spark = SparkSession.builder.appName("dds_t_fact_payments").getOrCreate()
 
     df_orders = (
         spark.read.format("jdbc")
