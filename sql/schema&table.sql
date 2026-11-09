@@ -205,6 +205,10 @@ and od.order_id is null;
 select max(opd.logical_date )
 from stg.order_payments_dataset opd ;
 
+select *
+from stg.order_payments_dataset opd ;
+
+
 
 select count(*)
 from stg.orders_dataset od 

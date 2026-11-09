@@ -154,7 +154,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./gpdata:/web/gpdata
+      - datagp_gas:/data
     
   airflow-apiserver:
     <<: *airflow-common
@@ -372,4 +372,4 @@ services:
 
 volumes:
   postgres-db-volume:
-  gpdata:
+  datagp_gas:
